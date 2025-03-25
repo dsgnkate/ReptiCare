@@ -1,0 +1,161 @@
+import type { Entry } from "@/lib/types"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Utensils, Bath, Stethoscope, TableIcon as Toilet } from "lucide-react"
+import { formatDistanceToNow } from "date-fns"
+import { ru } from "date-fns/locale"
+
+interface StatsProps {
+  entries: Entry[]
+}
+
+export default function Stats({ entries }: StatsProps) {
+  // Подсчет записей по типу
+  const foodCount = entries.filter((entry) => entry.type === "food").length
+  const toiletCount = entries.filter((entry) => entry.type === "toilet").length
+  const bathCount = entries.filter((entry) => entry.type === "bath").length
+  const vetCount = entries.filter((entry) => entry.type === "vet").length
+
+  // Получение самой последней записи каждого типа
+  const getLatestEntry = (type: Entry["type"]) => {
+    const typeEntries = entries.filter((entry) => entry.type === type)
+    if (typeEntries.length === 0) return null
+
+    return typeEntries.reduce((latest, current) => (new Date(current.date) > new Date(latest.date) ? current : latest))
+  }
+
+  const latestFood = getLatestEntry("food")
+  const latestToilet = getLatestEntry("toilet")
+  const latestBath = getLatestEntry("bath")
+  const latestVet = getLatestEntry("vet")
+
+  const formatTimeAgo = (entry: Entry | null) => {
+    if (!entry) return "Никогда"
+
+    try {
+      return formatDistanceToNow(new Date(entry.date), { addSuffix: true, locale: ru })
+    } catch (error) {
+      return "Неверная дата"
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Всего записей</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{entries.length}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Последняя активность</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {entries.length > 0
+                ? formatTimeAgo(
+                    entries.reduce((latest, current) =>
+                      new Date(current.date) > new Date(latest.date) ? current : latest,
+                    ),
+                  )
+                : "Нет активности"}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <h3 className="text-lg font-medium">Активность по типам</h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div className="flex items-center gap-2">
+              <Utensils className="h-5 w-5 text-green-500" />
+              <CardTitle className="text-sm font-medium">Кормление</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Количество</p>
+                <p className="text-2xl font-bold">{foodCount}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Последнее</p>
+                <p className="text-sm font-medium">{formatTimeAgo(latestFood)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div className="flex items-center gap-2">
+              <Toilet className="h-5 w-5 text-amber-500" />
+              <CardTitle className="text-sm font-medium">Туалет</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Количество</p>
+                <p className="text-2xl font-bold">{toiletCount}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Последнее</p>
+                <p className="text-sm font-medium">{formatTimeAgo(latestToilet)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div className="flex items-center gap-2">
+              <Bath className="h-5 w-5 text-blue-500" />
+              <CardTitle className="text-sm font-medium">Купание</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Количество</p>
+                <p className="text-2xl font-bold">{bathCount}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Последнее</p>
+                <p className="text-sm font-medium">{formatTimeAgo(latestBath)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div className="flex items-center gap-2">
+              <Stethoscope className="h-5 w-5 text-red-500" />
+              <CardTitle className="text-sm font-medium">Визит к ветеринару</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Количество</p>
+                <p className="text-2xl font-bold">{vetCount}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Последнее</p>
+                <p className="text-sm font-medium">{formatTimeAgo(latestVet)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
