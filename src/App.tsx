@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./components/ui/card";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { Label } from "./components/ui/label";
@@ -8,7 +8,6 @@ import { Utensils, Bath, Stethoscope, TableIcon as Toilet, Plus, PlusCircle } fr
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "./components/ui/dialog";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { cn } from "./lib/utils";
 
 // Типы данных
 type EntryType = "feeding" | "toilet" | "bath" | "vet";
